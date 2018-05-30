@@ -1,0 +1,150 @@
+<html>
+	<head>
+		<title>Audio Visualizer</title>
+		<style>
+			body { margin: 0; background-color: #ffffff}
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body >
+	
+		<button onclick="togglePlay();" id = "song" style = "margin-left:38%;margin-top: 3em;">play/pause</button>
+		<!-- <button onclick="chooseSong('spent.mp3');" id = "song" class = "button">Spent Missing - froyo ma</button>
+		<button onclick="chooseSong('casin.mp3');" id = "song" class = "button">casin - glue70</button>
+		<button onclick="chooseSong('divina.mp3');" id = "song" class = "button">Divina - Toro y moi</button>
+		<button onclick="chooseSong('champion.mp3');" id = "song" class = "button">Champion featuring Travis Scott - Nav</button> -->
+		<select style = "position: absolute; margin-top: 3em; margin-left:1em;">
+			<option onclick="chooseSong('casin.mp3');" id = "song" >casin - glue70</option>
+			<option onclick="chooseSong('divina.mp3');" id = "song" selected>Divina - Toro y moi</option>
+			<option onclick="chooseSong('vcr.mp3');" id = "song">VCR - The xx</option>
+		  </select> 
+
+		<script src="three.js"></script>
+		<script src="audiocontrol.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			
+			var renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setSize( window.innerWidth, window.innerHeight-68 );
+			// renderer.setSize( 300, 400 );
+			var controls = new THREE.OrbitControls( camera,renderer.domElement );
+			document.body.appendChild( renderer.domElement );
+
+			var geo = new THREE.CubeGeometry( 1, 1, 1 );
+			
+			
+			var cubes = new Array();
+			var i = 0;
+		
+
+			for(var x = 0; x < 20; x+=2) {
+				var j = 0;
+				cubes[i] = new Array();
+				for(var z = 0; z < 10; z+=2) {
+					var material = new THREE.MeshBasicMaterial({color:0x000000});
+					var geometry = new THREE.EdgesGeometry( geo );
+					
+					cubes[i][j] = new THREE.LineSegments( geometry, material );
+					
+					cubes[i][j].position.set(x,0,z);
+					scene.add(cubes[i][j]);
+					j++;
+				}
+				i++;
+			}
+
+// create an AudioListener and add it to the camera
+var listener = new THREE.AudioListener();
+camera.add( listener );
+
+// create an Audio source
+var sound = new THREE.Audio( listener );
+
+// load a sound and set it as the Audio object's buffer
+var audioLoader = new THREE.AudioLoader();
+var isPlaying = false;
+
+audioLoader.load( 'divina.mp3', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop(true);
+			sound.setVolume(0.5);
+			sound.play();
+			isPlaying = true;
+		});
+
+function chooseSong(song) {
+	if (isPlaying) {
+		sound.stop();
+		isPlaying = false;
+	} 
+		audioLoader.load( song, function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop(true);
+			sound.setVolume(0.5);
+			sound.play();
+			isPlaying = true;
+		});
+	
+
+
+}
+function togglePlay() {
+	if (isPlaying) {
+		sound.pause();
+		isPlaying = false;
+	} else {
+		sound.play();
+		isPlaying = true;
+	}
+	};
+// create an AudioAnalyser, passing in the sound and desired fftSize
+var analyser = new THREE.AudioAnalyser( sound, 512 );
+
+var array = new Array();
+
+
+			camera.position.z = 20;
+			controls.update();
+			camera.position.x = 20;
+			controls.update();
+			camera.position.y = 8;
+			controls.update();
+			camera.lookAt(new THREE.Vector3(0,0,0));
+			
+			var animate = function () {
+				array = analyser.getFrequencyData();
+				var boost = 0;
+				var k = 0;
+				for (var m = 0; m < array.length; m++) {
+		            boost += array[m];
+		        }
+				boost = boost / array.length;
+				
+				for(var i = 0; i < cubes.length; i++) {
+				
+					for(var j = 0; j < cubes[i].length; j++) {
+
+						var scale = (array[k] + boost) / 25;
+
+						cubes[i][j].scale.y = (scale < 1 ? 1 : scale);
+
+						
+						cubes[i][j].material.color.setHSL(scale/15,1,.5);
+						
+						k += (k < array.length ? 1 : 0);
+						
+					}
+				}
+				requestAnimationFrame( animate );
+                
+				controls.update();
+				renderer.render(scene, camera);
+			};
+
+			animate();
+		</script>
+		
+	</body>
+</html>
