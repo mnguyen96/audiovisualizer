@@ -2,38 +2,119 @@
 	<head>
 		<title>Audio Visualizer</title>
 		<style>
-			body { margin: 0; background-color: #ffffff}
+			body { margin: 0; background-color: #7fa3f1}
 			canvas { width: 100%; height: 100% }
+
+			#start {
+				position: fixed;
+				display: block;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0,0,0,0.5);
+				z-index: 2;
+				cursor: pointer;
+			}
+
+			#text{
+				
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				font-size: 50px;
+				color: white;
+				transform: translate(-50%,-50%);
+				-ms-transform: translate(-50%,-50%);
+			}
+			#pause {
+				text-align: center;
+				display: block;
+			}
+			#play {
+				display: none;
+			}
+			#select {
+				margin-left: 2%;
+				position: relative;
+				float: left;
+				display: block;
+				width: fit-content;
+			}
+
+			#author {
+				color: white;
+				text-align: center;
+				width: 100%;
+				font-size: 10px;
+			}
+
+			.controls {
+				width: 100%;
+				height: 8%;
+				display: flex;
+  				align-items: center;
+  				justify-content: center;
+			}
+
+
+
 		</style>
 	</head>
 	<body >
-	
-		<button onclick="togglePlay();" id = "song" style = "margin-left:38%;margin-top: 3em;">play/pause</button>
-		<!-- <button onclick="chooseSong('spent.mp3');" id = "song" class = "button">Spent Missing - froyo ma</button>
-		<button onclick="chooseSong('casin.mp3');" id = "song" class = "button">casin - glue70</button>
-		<button onclick="chooseSong('divina.mp3');" id = "song" class = "button">Divina - Toro y moi</button>
-		<button onclick="chooseSong('champion.mp3');" id = "song" class = "button">Champion featuring Travis Scott - Nav</button> -->
-		<select style = "position: absolute; margin-top: 3em; margin-left:1em;">
+		<div id="start" onclick="chooseSong(); offStart();">
+			<div id="text">Click to play</div>
+		</div>
+
+		<div class = "controls">
+		<button onclick="togglePause(); off();" id = "pause">Pause</button>
+		<button onclick="togglePlay(); on();" id = "play">Play</button>
+
+		<select id = "select">
 			<option onclick="chooseSong('casin.mp3');" id = "song" >casin - glue70</option>
 			<option onclick="chooseSong('Divina.mp3');" id = "song" selected>Divina - Toro y moi</option>
 			<option onclick="chooseSong('vcr.mp3');" id = "song">VCR - The xx</option>
 		  </select> 
 
+		</div>
+
+		  <div id = "author">
+		  Made by Michael Nguyen 
+		  <br>
+		  mnguyen96.githib.io
+		</div>
+
 		<script src="three.js"></script>
-		<script src="audiocontrol.js"></script>
+		<script src="OrbitControls.js"></script>
+
 		<script>
-			var scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xffffff );
-			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-			
+
+			//remove overlay after first click
+			function offStart() {
+				document.getElementById("start").style.display = "none";
+			}
+
+		</script>
+
+		<script>
 			var renderer = new THREE.WebGLRenderer({ antialias: true });
 			renderer.setSize( window.innerWidth, window.innerHeight-68 );
-			// renderer.setSize( 300, 400 );
-			var controls = new THREE.OrbitControls( camera,renderer.domElement );
 			document.body.appendChild( renderer.domElement );
 
-			var geo = new THREE.CubeGeometry( 1, 1, 1 );
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x7fa3f1 );
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			var controls = new THREE.OrbitControls( camera,renderer.domElement );
 			
+			controls.autoRotate = true;
+			
+			camera.position.set( 30, 10, 8 );
+
+			camera.lookAt(new THREE.Vector3(0,0,0));
+
+			var geo = new THREE.CubeGeometry( 1, 1, 1 );
 			
 			var cubes = new Array();
 			var i = 0;
@@ -66,52 +147,53 @@ var sound = new THREE.Audio( listener );
 var audioLoader = new THREE.AudioLoader();
 var isPlaying = false;
 
-audioLoader.load( 'divina.mp3', function( buffer ) {
-			sound.setBuffer( buffer );
-			sound.setLoop(true);
-			sound.setVolume(0.5);
-			sound.play();
-			isPlaying = true;
-		});
 
 function chooseSong(song) {
-	if (isPlaying) {
+	if (sound.isPlaying == true) {
 		sound.stop();
-		isPlaying = false;
-	} 
-		audioLoader.load( song, function( buffer ) {
-			sound.setBuffer( buffer );
-			sound.setLoop(true);
-			sound.setVolume(0.5);
-			sound.play();
-			isPlaying = true;
-		});
-	
-
-
-}
-function togglePlay() {
-	if (isPlaying) {
-		sound.pause();
-		isPlaying = false;
-	} else {
-		sound.play();
-		isPlaying = true;
 	}
-	};
+	
+	document.getElementById("pause").style.display = "block";
+	document.getElementById("play").style.display = "none";
+
+	if (song == undefined) {
+		//default song on first run
+		audioLoader.load( "Divina.mp3", function( buffer ) {
+		sound.setBuffer( buffer );
+		sound.setLoop(true);
+		sound.setVolume(0.5);
+		sound.play();
+	});	
+	}
+
+	audioLoader.load( song, function( buffer ) {
+		sound.setBuffer( buffer );
+		sound.setLoop(true);
+		sound.setVolume(0.5);
+		sound.play();
+	});	
+}
+
+function togglePlay() {
+	document.getElementById("pause").style.display = "block";
+	document.getElementById("play").style.display = "none";
+	sound.play();
+};
+
+function togglePause() {
+	sound.pause();
+	document.getElementById("pause").style.display = "none";
+	document.getElementById("play").style.display = "block";
+};
+
 // create an AudioAnalyser, passing in the sound and desired fftSize
 var analyser = new THREE.AudioAnalyser( sound, 512 );
 
 var array = new Array();
 
 
-			camera.position.z = 20;
-			controls.update();
-			camera.position.x = 20;
-			controls.update();
-			camera.position.y = 8;
-			controls.update();
-			camera.lookAt(new THREE.Vector3(0,0,0));
+			
+			
 			
 			var animate = function () {
 				array = analyser.getFrequencyData();
