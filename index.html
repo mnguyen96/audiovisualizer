@@ -75,12 +75,10 @@
       <button onclick="togglePlay()" id="play">Play</button>
       <select id="select" onChange="chooseSong(this.value)">
         <option onclick="chooseSong('casin.mp3');" id="song">
-          casin - glue70
+          casin.mp3
         </option>
-        <option value="Divina.mp3" id="song" selected
-          >Divina - Toro y moi</option
-        >
-        <option value="vcr.mp3" id="song">VCR - The xx</option>
+        <option value="Divina.mp3" id="song" selected>Divina.mp3</option>
+        <option value="vcr.mp3" id="song">vcr.mp3</option>
       </select>
     </div>
 
@@ -154,9 +152,6 @@
       var isPlaying = false;
 
       function chooseSong(song) {
-        console.log(sound);
-        console.log("TESTEST");
-
         if (sound.isPlaying) {
           sound.stop();
         }
