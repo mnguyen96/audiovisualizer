@@ -73,14 +73,14 @@
     <div class="controls">
       <button onclick="togglePause()" id="pause">Pause</button>
       <button onclick="togglePlay()" id="play">Play</button>
-      <button onclick="chooseSong('casin.mp3');" id="song">
-        casin - glue70
-      </button>
-      <select id="select">
-        <option onclick="chooseSong('Divina.mp3');" id="song" selected
+      <select id="select" onChange="chooseSong(this.value)">
+        <option onclick="chooseSong('casin.mp3');" id="song">
+          casin - glue70
+        </option>
+        <option value="Divina.mp3" id="song" selected
           >Divina - Toro y moi</option
         >
-        <option onclick="chooseSong('vcr.mp3');" id="song">VCR - The xx</option>
+        <option value="vcr.mp3" id="song">VCR - The xx</option>
       </select>
     </div>
 
