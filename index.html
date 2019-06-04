@@ -1,232 +1,230 @@
 <html>
-	<head>
-		<title>Audio Visualizer</title>
-		<style>
-			body { margin: 0; background-color: #8fb2ff}
-			canvas { width: 100%; height: 100% }
+  <head>
+    <title>Audio Visualizer</title>
+    <style>
+      body {
+        margin: 0;
+        background-color: #8fb2ff;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
 
-			#start {
-				position: fixed;
-				display: block;
-				width: 100%;
-				height: 100%;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				background-color: rgba(0,0,0,0.5);
-				z-index: 2;
-				cursor: pointer;
-			}
+      #start {
+        position: fixed;
+        display: block;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        cursor: pointer;
+      }
 
-			#text{
-				
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				font-size: 50px;
-				color: white;
-				transform: translate(-50%,-50%);
-				-ms-transform: translate(-50%,-50%);
-			}
-			#pause {
-				text-align: center;
-				display: block;
-			}
-			#play {
-				display: none;
-			}
-			#select {
-				margin-left: 2%;
-				position: relative;
-				float: left;
-				display: block;
-				width: fit-content;
-			}
+      #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        font-size: 50px;
+        color: white;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+      }
+      #pause {
+        text-align: center;
+        display: block;
+      }
+      #play {
+        display: none;
+      }
+      #select {
+        margin-left: 2%;
+        position: relative;
+        float: left;
+        display: block;
+        width: fit-content;
+      }
 
-			#author {
-				color: white;
-				text-align: center;
-				width: 100%;
-				font-size: 10px;
-			}
+      #author {
+        color: white;
+        text-align: center;
+        width: 100%;
+        font-size: 10px;
+      }
 
-			.controls {
-				width: 100%;
-				height: 8%;
-				display: flex;
-  				align-items: center;
-  				justify-content: center;
-			}
+      .controls {
+        width: 100%;
+        height: 8%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="start" onclick="chooseSong(); offStart();">
+      <div id="text">Click to play</div>
+    </div>
 
+    <div class="controls">
+      <button onclick="togglePause()" id="pause">Pause</button>
+      <button onclick="togglePlay()" id="play">Play</button>
 
+      <select id="select">
+        <option onclick="chooseSong('casin.mp3');" id="song"
+          >casin - glue70</option
+        >
+        <option onclick="chooseSong('Divina.mp3');" id="song" selected
+          >Divina - Toro y moi</option
+        >
+        <option onclick="chooseSong('vcr.mp3');" id="song">VCR - The xx</option>
+      </select>
+    </div>
 
-		</style>
-	</head>
-	<body >
-		<div id="start" onclick="chooseSong(); offStart();">
-			<div id="text">Click to play</div>
-		</div>
+    <div id="author">
+      Made by Michael Nguyen
+      <br />
+      mnguyen96.githib.io
+    </div>
 
-		<div class = "controls">
-		<button onclick="togglePause(); off();" id = "pause">Pause</button>
-		<button onclick="togglePlay(); on();" id = "play">Play</button>
+    <script src="three.js"></script>
+    <script src="OrbitControls.js"></script>
 
-		<select id = "select">
-			<option onclick="chooseSong('casin.mp3');" id = "song" >casin - glue70</option>
-			<option onclick="chooseSong('Divina.mp3');" id = "song" selected>Divina - Toro y moi</option>
-			<option onclick="chooseSong('vcr.mp3');" id = "song">VCR - The xx</option>
-		  </select> 
+    <script>
+      //remove overlay after first click
+      function offStart() {
+        document.getElementById("start").style.display = "none";
+      }
+    </script>
 
-		</div>
+    <script>
+      var renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight - 68);
+      document.body.appendChild(renderer.domElement);
 
-		  <div id = "author">
-		  Made by Michael Nguyen 
-		  <br>
-		  mnguyen96.githib.io
-		</div>
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x8fb2ff);
+      var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-		<script src="three.js"></script>
-		<script src="OrbitControls.js"></script>
+      controls.autoRotate = true;
 
-		<script>
+      camera.position.set(30, 10, 8);
 
-			//remove overlay after first click
-			function offStart() {
-				document.getElementById("start").style.display = "none";
-			}
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-		</script>
+      var geo = new THREE.CubeGeometry(1, 1, 1);
 
-		<script>
-			var renderer = new THREE.WebGLRenderer({ antialias: true });
-			renderer.setSize( window.innerWidth, window.innerHeight-68 );
-			document.body.appendChild( renderer.domElement );
+      var cubes = new Array();
+      var i = 0;
 
-			var scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x8fb2ff );
-			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-			var controls = new THREE.OrbitControls( camera,renderer.domElement );
-			
-			controls.autoRotate = true;
-			
-			camera.position.set( 30, 10, 8 );
+      for (var x = 0; x < 20; x += 2) {
+        var j = 0;
+        cubes[i] = new Array();
+        for (var z = 0; z < 10; z += 2) {
+          var material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+          var geometry = new THREE.EdgesGeometry(geo);
 
-			camera.lookAt(new THREE.Vector3(0,0,0));
+          cubes[i][j] = new THREE.LineSegments(geometry, material);
 
-			var geo = new THREE.CubeGeometry( 1, 1, 1 );
-			
-			var cubes = new Array();
-			var i = 0;
-		
+          cubes[i][j].position.set(x, 0, z);
+          scene.add(cubes[i][j]);
+          j++;
+        }
+        i++;
+      }
 
-			for(var x = 0; x < 20; x+=2) {
-				var j = 0;
-				cubes[i] = new Array();
-				for(var z = 0; z < 10; z+=2) {
-					var material = new THREE.MeshBasicMaterial({color:0x000000});
-					var geometry = new THREE.EdgesGeometry( geo );
-					
-					cubes[i][j] = new THREE.LineSegments( geometry, material );
-					
-					cubes[i][j].position.set(x,0,z);
-					scene.add(cubes[i][j]);
-					j++;
-				}
-				i++;
-			}
+      // create an AudioListener and add it to the camera
+      var listener = new THREE.AudioListener();
+      camera.add(listener);
 
-// create an AudioListener and add it to the camera
-var listener = new THREE.AudioListener();
-camera.add( listener );
+      // create an Audio source
+      var sound = new THREE.Audio(listener);
 
-// create an Audio source
-var sound = new THREE.Audio( listener );
+      // load a sound and set it as the Audio object's buffer
+      var audioLoader = new THREE.AudioLoader();
+      var isPlaying = false;
 
-// load a sound and set it as the Audio object's buffer
-var audioLoader = new THREE.AudioLoader();
-var isPlaying = false;
+      function chooseSong(song) {
+        console.log(sound);
+        if (sound.isPlaying == true) {
+          sound.stop();
+        }
 
+        document.getElementById("pause").style.display = "block";
+        document.getElementById("play").style.display = "none";
 
-function chooseSong(song) {
-	if (sound.isPlaying == true) {
-		sound.stop();
-	}
-	
-	document.getElementById("pause").style.display = "block";
-	document.getElementById("play").style.display = "none";
+        if (song == undefined) {
+          //default song on first run
+          audioLoader.load("Divina.mp3", function(buffer) {
+            sound.setBuffer(buffer);
+            sound.setLoop(true);
+            sound.setVolume(0.5);
+            sound.play();
+          });
+        }
 
-	if (song == undefined) {
-		//default song on first run
-		audioLoader.load( "Divina.mp3", function( buffer ) {
-		sound.setBuffer( buffer );
-		sound.setLoop(true);
-		sound.setVolume(0.5);
-		sound.play();
-	});	
-	}
+        audioLoader.load(song, function(buffer) {
+          sound.setBuffer(buffer);
+          sound.setLoop(true);
+          sound.setVolume(0.5);
+          sound.play();
+        });
+      }
 
-	audioLoader.load( song, function( buffer ) {
-		sound.setBuffer( buffer );
-		sound.setLoop(true);
-		sound.setVolume(0.5);
-		sound.play();
-	});	
-}
+      function togglePlay() {
+        document.getElementById("pause").style.display = "block";
+        document.getElementById("play").style.display = "none";
+        sound.play();
+      }
 
-function togglePlay() {
-	document.getElementById("pause").style.display = "block";
-	document.getElementById("play").style.display = "none";
-	sound.play();
-};
+      function togglePause() {
+        sound.pause();
+        document.getElementById("pause").style.display = "none";
+        document.getElementById("play").style.display = "block";
+      }
 
-function togglePause() {
-	sound.pause();
-	document.getElementById("pause").style.display = "none";
-	document.getElementById("play").style.display = "block";
-};
+      // create an AudioAnalyser, passing in the sound and desired fftSize
+      var analyser = new THREE.AudioAnalyser(sound, 512);
 
-// create an AudioAnalyser, passing in the sound and desired fftSize
-var analyser = new THREE.AudioAnalyser( sound, 512 );
+      var array = new Array();
 
-var array = new Array();
+      var animate = function() {
+        array = analyser.getFrequencyData();
+        var boost = 0;
+        var k = 0;
+        for (var m = 0; m < array.length; m++) {
+          boost += array[m];
+        }
+        boost = boost / array.length;
 
+        for (var i = 0; i < cubes.length; i++) {
+          for (var j = 0; j < cubes[i].length; j++) {
+            var scale = (array[k] + boost) / 25;
 
-			
-			
-			
-			var animate = function () {
-				array = analyser.getFrequencyData();
-				var boost = 0;
-				var k = 0;
-				for (var m = 0; m < array.length; m++) {
-		            boost += array[m];
-		        }
-				boost = boost / array.length;
-				
-				for(var i = 0; i < cubes.length; i++) {
-				
-					for(var j = 0; j < cubes[i].length; j++) {
+            cubes[i][j].scale.y = scale < 1 ? 1 : scale;
 
-						var scale = (array[k] + boost) / 25;
+            cubes[i][j].material.color.setHSL(scale / 15, 1, 0.5);
 
-						cubes[i][j].scale.y = (scale < 1 ? 1 : scale);
+            k += k < array.length ? 1 : 0;
+          }
+        }
+        requestAnimationFrame(animate);
 
-						
-						cubes[i][j].material.color.setHSL(scale/15,1,.5);
-						
-						k += (k < array.length ? 1 : 0);
-						
-					}
-				}
-				requestAnimationFrame( animate );
-                
-				controls.update();
-				renderer.render(scene, camera);
-			};
+        controls.update();
+        renderer.render(scene, camera);
+      };
 
-			animate();
-		</script>
-		
-	</body>
+      animate();
+    </script>
+  </body>
 </html>
