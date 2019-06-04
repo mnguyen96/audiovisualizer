@@ -154,9 +154,6 @@
       var isPlaying = false;
 
       function chooseSong(song) {
-        console.log(sound);
-        console.log("TESTEST");
-
         if (sound.isPlaying) {
           sound.stop();
         }
@@ -184,7 +181,6 @@
       }
 
       function togglePlay() {
-        console.log("test");
         document.getElementById("pause").style.display = "block";
         document.getElementById("play").style.display = "none";
         sound.play();
