@@ -172,14 +172,14 @@
             sound.setVolume(0.5);
             sound.play();
           });
+        } else {
+          audioLoader.load(song, function(buffer) {
+            sound.setBuffer(buffer);
+            sound.setLoop(true);
+            sound.setVolume(0.5);
+            sound.play();
+          });
         }
-
-        audioLoader.load(song, function(buffer) {
-          sound.setBuffer(buffer);
-          sound.setLoop(true);
-          sound.setVolume(0.5);
-          sound.play();
-        });
       }
 
       function togglePlay() {
