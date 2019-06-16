@@ -157,12 +157,11 @@
         if (sound.isPlaying) {
           sound.stop();
         }
-        sound.pause();
 
         document.getElementById("pause").style.display = "block";
         document.getElementById("play").style.display = "none";
 
-        if (song === undefined) {
+        if (song) {
           //default song on first run
           audioLoader.load("Divina.mp3", function(buffer) {
             sound.setBuffer(buffer);
