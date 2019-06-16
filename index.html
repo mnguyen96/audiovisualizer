@@ -188,9 +188,9 @@
       }
 
       function togglePause() {
-        sound.pause();
         document.getElementById("pause").style.display = "none";
         document.getElementById("play").style.display = "block";
+        sound.pause();
       }
 
       // create an AudioAnalyser, passing in the sound and desired fftSize
