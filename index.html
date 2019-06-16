@@ -154,6 +154,7 @@
       var isPlaying = false;
 
       function chooseSong(song) {
+        console.log(sound);
         if (sound.isPlaying) {
           sound.stop();
         }
@@ -161,7 +162,7 @@
         document.getElementById("pause").style.display = "block";
         document.getElementById("play").style.display = "none";
 
-        if (song) {
+        if (song === undefined) {
           //default song on first run
           audioLoader.load("Divina.mp3", function(buffer) {
             sound.setBuffer(buffer);
